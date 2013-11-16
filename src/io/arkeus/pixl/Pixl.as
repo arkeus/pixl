@@ -4,7 +4,11 @@ package io.arkeus.pixl {
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
 	import flash.events.Event;
+	import flash.geom.Rectangle;
 	import flash.utils.getTimer;
+	
+	import io.arkeus.pixl.canvas.PxCanvas;
+	import io.arkeus.pixl.state.PxStateStack;
 
 	public class Pixl extends Sprite {
 		public static const LIBRARY:String = "Pixl";
@@ -23,9 +27,15 @@ package io.arkeus.pixl {
 		
 		public static var stage:Stage;
 		public static var engine:Pixl;
+		public static var canvas:PxCanvas;
+		public static var states:PxStateStack;
 		
-		public function Pixl() {
+		public static var initialState:Class;
+		
+		public function Pixl(initialState:Class) {
 			Pixl.engine = this;
+			Pixl.initialState = initialState;
+			Pixl.states = new PxStateStack;
 			
 			addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 		}
@@ -40,11 +50,15 @@ package io.arkeus.pixl {
 			stage.align = StageAlign.TOP_LEFT;
 			stage.frameRate = 60;
 			
-			addEventListener(Event.ENTER_FRAME, onEnterFrame);
-			
 			Pixl.width = stage.stageWidth;
 			Pixl.height = stage.stageHeight;
 			Pixl.stage = stage;
+			Pixl.canvas = new PxCanvas(Pixl.width, Pixl.height);
+			
+			addChild(Pixl.canvas);
+			addEventListener(Event.ENTER_FRAME, onEnterFrame);
+			
+			states.push(new Pixl.initialState());
 		}
 		
 		protected function create():void {}
@@ -71,11 +85,12 @@ package io.arkeus.pixl {
 		}
 		
 		protected function update():void {
-			
+			states.process();
 		}
 		
 		protected function draw():void {
-			
+			canvas.clear();
+			states.draw();
 		}
 	}
 }

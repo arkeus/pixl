@@ -33,6 +33,7 @@ package io.arkeus.pixl.basic {
 		}
 		
 		public function update():void {}
+		public function draw():void {}
 		
 		private function calculateVelocity(velocity:Number, acceleration:Number, drag:Number, terminal:Number):Number {
 			if (acceleration != 0) {
